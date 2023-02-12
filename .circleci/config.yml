@@ -6,23 +6,19 @@ jobs:
       - image: circleci/ios:latest
 
     environment:
-      DOCKER_USERNAME: << pipeline.environment.DOCKER_USERNAME >>
-      DOCKER_PASSWORD: << pipeline.environment.DOCKER_PASSWORD >>
+      DOCKER_USERNAME: DOCKER_USERNAME
+      DOCKER_PASSWORD: DOCKER_PASSWORD
 
     steps:
       - checkout
 
       - run:
           name: Login to Docker Hub
-          command: |
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          command: echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
       - run:
-          name: Build Docker Image
+          name: Build and push Docker image
           command: |
-            docker build -t $DOCKER_USERNAME/my-image .
-
-      - run:
-          name: Push Docker Image
-          command: |
-            docker push $DOCKER_USERNAME/my-image
+            docker build -t myapp .
+            docker tag myapp "$DOCKER_USERNAME/myapp:latest"
+            docker push "$DOCKER_USERNAME/myapp:latest"
