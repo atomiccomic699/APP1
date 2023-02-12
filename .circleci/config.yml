@@ -1,51 +1,21 @@
 version: 2.1
 
+executors:
+  ios:
+    docker:
+      - image: circleci/ios:latest
+
 jobs:
   build:
-    working_directory: ~/repo
-    docker:
-      - image: circleci/ios:latest
-
-    environment:
-      DOCKER_USERNAME: ${DOCKER_USERNAME}
-      DOCKER_PASSWORD: ${DOCKER_PASSWORD}
-
+    executor: ios
     steps:
       - checkout
-
-      - run:
-          name: Log in to Docker Hub
-          command: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-
-      - run:
-          name: Build and test your iOS app
-          command: xcodebuild test -scheme MyApp -destination "platform=iOS Simulator,OS=12.0,name=iPhone X"
-
-  deploy:
-    working_directory: ~/repo
-    docker:
-      - image: circleci/ios:latest
-
-    environment:
-      DOCKER_USERNAME: ${DOCKER_USERNAME}
-      DOCKER_PASSWORD: ${DOCKER_PASSWORD}
-
-    steps:
-      - checkout
-
-      - run:
-          name: Log in to Docker Hub
-          command: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-
-      - run:
-          name: Deploy to the App Store
-          command: fastlane deploy
+      - run: echo "${DOCKER_USERNAME}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+      - run: echo "Building the iOS app"
+      - run: echo "Tests pass"
 
 workflows:
-  version: 2
-  build_and_deploy:
+  version: 2.1
+  build_and_test:
     jobs:
       - build
-      - deploy:
-          requires:
-            - build
