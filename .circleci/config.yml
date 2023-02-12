@@ -1,0 +1,23 @@
+version: 2.1
+
+jobs:
+  build:
+    working_directory: ~/project
+    docker:
+      - image: circleci/ios:latest
+
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            brew install swiftlint
+      - run:
+          name: Build project
+          command: |
+            xcodebuild clean build -project MyApp.xcodeproj -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 11 Pro Max,OS=14.0'
+
+      - run:
+          name: Test project
+          command: |
+            xcodebuild test -project MyApp.xcodeproj -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 11 Pro Max,OS=14.0'
