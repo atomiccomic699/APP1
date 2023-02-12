@@ -21,3 +21,4 @@ jobs:
           name: Test project
           command: |
             xcodebuild test -project MyApp.xcodeproj -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 11 Pro Max,OS=14.0'
+      - setup_remote_docker
