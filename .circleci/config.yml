@@ -2,23 +2,27 @@ version: 2.1
 
 jobs:
   build:
-    working_directory: ~/project
     docker:
       - image: circleci/ios:latest
 
+    environment:
+      DOCKER_USERNAME: << pipeline.environment.DOCKER_USERNAME >>
+      DOCKER_PASSWORD: << pipeline.environment.DOCKER_PASSWORD >>
+
     steps:
       - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            brew install swiftlint
-      - run:
-          name: Build project
-          command: |
-            xcodebuild clean build -project MyApp.xcodeproj -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 11 Pro Max,OS=14.0'
 
       - run:
-          name: Test project
+          name: Login to Docker Hub
           command: |
-            xcodebuild test -project MyApp.xcodeproj -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 11 Pro Max,OS=14.0'
-      - setup_remote_docker
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t $DOCKER_USERNAME/my-image .
+
+      - run:
+          name: Push Docker Image
+          command: |
+            docker push $DOCKER_USERNAME/my-image
